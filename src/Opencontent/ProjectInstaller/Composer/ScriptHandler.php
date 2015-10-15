@@ -23,6 +23,7 @@ class ScriptHandler
         $script = new static( $event );
         $script->installSettings();
         $script->installConfigPhp();
+        $script->removeEzComposerJson();
     }
 
     public static function update( CommandEvent $event )
@@ -30,6 +31,7 @@ class ScriptHandler
         $script = new static( $event );
         $script->installSettings();
         $script->installConfigPhp();
+        $script->removeEzComposerJson();
     }
 
     protected function __construct( CommandEvent $event )
@@ -65,7 +67,7 @@ class ScriptHandler
         }
     }
 
-    protected function installSettings( $question = "Installo settings? (y|n) " )
+    protected function installSettings( $question = "Installo i settings? (y|n) " )
     {
         if ( $this->io->askConfirmation( $question ) )
         {
@@ -81,13 +83,22 @@ class ScriptHandler
         }
     }
 
-    protected function installConfigPhp( $question = "Installo config.php? (y|n) " )
+    protected function installConfigPhp( $question = "Installo il config.php? (y|n) " )
     {
         $original = $this->currentDirectory( '/config.php' );
         $target = $this->documentRootDirectory( '/config.php' );
         if ( file_exists( $original ) && $this->io->askConfirmation( $question ) )
         {
             $this->doSymlink( $original, $target );
+        }
+    }
+
+    protected function removeEzComposerJson( $question = "Rimuovo composer.json di ez per sicurezza? (y|n) " )
+    {
+        $composer = $this->documentRootDirectory( '/composer.json' );
+        if ( file_exists( $composer ) && $this->io->askConfirmation( $question ) )
+        {
+            $this->fs->remove( $composer );
         }
     }
 
