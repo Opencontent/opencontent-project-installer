@@ -61,9 +61,16 @@ class ScriptHandler
             $this->fs->remove( $target );
         }
 
-        if ( $original != $target )
+        if ( $this->fs->exists( $original ) )
         {
-            $this->fs->symlink( $original, $target );
+            if ( $original != $target )
+            {
+                $this->fs->symlink( $original, $target );
+            }
+        }
+        else
+        {
+            $this->io->writeError( "File o cartella $original non trovato!" );
         }
     }
 
@@ -71,15 +78,25 @@ class ScriptHandler
     {
         if ( $this->io->askConfirmation( $question ) )
         {
-            $this->doSymlink(
-                $this->currentDirectory( '/settings/override' ),
-                $this->documentRootDirectory( '/settings/override' )
-            );
+            $env = 'dev';
 
-            $this->doSymlink(
-                $this->currentDirectory( '/settings/siteaccess' ),
-                $this->documentRootDirectory( '/settings/siteaccess' )
-            );
+            $env = $this->io->ask( "Quale ambiente vuoi installare? Scegli dev o prod [$env]", $env );
+            if ( in_array( $env, array( 'dev', 'prod' ) ) )
+            {
+                $this->doSymlink(
+                    $this->currentDirectory( "/settings_{$env}/override" ),
+                    $this->documentRootDirectory( '/settings/override' )
+                );
+
+                $this->doSymlink(
+                    $this->currentDirectory( "/settings_{$env}/siteaccess" ),
+                    $this->documentRootDirectory( '/settings/siteaccess' )
+                );
+            }
+            else
+            {
+                $this->io->writeError( "Ambiente $env non trovato!" );
+            }
         }
     }
 
