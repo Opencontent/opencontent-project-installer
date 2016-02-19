@@ -24,6 +24,7 @@ class ScriptHandler
         $script->installSettings();
         $script->installConfigPhp();
         $script->removeEzComposerJson();
+        $script->removeEzDemo();
     }
 
     public static function update( CommandEvent $event )
@@ -32,6 +33,7 @@ class ScriptHandler
         $script->installSettings();
         $script->installConfigPhp();
         $script->removeEzComposerJson();
+        $script->removeEzDemo();
     }
 
     protected function __construct( CommandEvent $event )
@@ -119,4 +121,12 @@ class ScriptHandler
         }
     }
 
+    protected function removeEzDemo( $question = "Rimuovo estensione ezdemo? (y|n) " )
+    {
+        $ezDemo = $this->documentRootDirectory( '/extension/ezdemo' );
+        if ( file_exists( $ezDemo ) && $this->io->askConfirmation( $question ) )
+        {
+            $this->fs->remove( $ezDemo );
+        }
+    }
 }
